@@ -546,11 +546,15 @@ def normalization_weights_setup(
         # fill the process weight table with per-process cross sections
         for process_inst in process_insts:
             if self.config_inst.campaign.ecm not in process_inst.xsecs:
-                raise KeyError(
+                #raise KeyError(
+                logger.warning(
                     f"no cross section registered for process {process_inst} for center-of-mass energy of "
                     f"{self.config_inst.campaign.ecm}",
                 )
-            xsec = process_inst.get_xsec(self.config_inst.campaign.ecm).nominal
+                logger.warning("cross-section is fixed to 1. in order to proceed please fix in cmsdb")
+                xsec = 1.
+            else:
+                xsec = process_inst.get_xsec(self.config_inst.campaign.ecm).nominal 
             sum_weights = merged_selection_stats_sum_weights["sum_mc_weight_per_process"][str(process_inst.id)]
             fill_weight_table(process_inst, xsec, sum_weights)
 

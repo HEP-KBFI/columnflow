@@ -930,6 +930,7 @@ class HTCondorWorkflow(RemoteWorkflowMixin, law.htcondor.HTCondorWorkflow):
 _default_slurm_flavor = law.config.get_expanded("analysis", "slurm_flavor", "maxwell")
 _default_slurm_partition = law.config.get_expanded("analysis", "slurm_partition", "cms-uhh")
 _default_slurm_runtime = law.util.parse_duration(
+_default_slurm_cpus = law.config.get_expanded("analysis", "slurm_cpus", 1)
     law.config.get_expanded("analysis", "slurm_runtime", 3.0),
     input_unit="h",
     unit="h",
@@ -960,6 +961,12 @@ class SlurmWorkflow(RemoteWorkflowMixin, law.slurm.SlurmWorkflow):
         significant=False,
         description="the 'flavor' (i.e. configuration name) of the batch system; choices: "
         f"maxwell; default: '{_default_slurm_flavor}'",
+    )
+    slurm_cpus = luigi.IntParameter(
+        default=_default_slurm_cpus,
+        significant=True,
+        description="number of CPUs to request; empty value leads to the cluster default setting; "
+        "_default_slurm_cpus per default",
     )
 
     # parameters that should not be passed to a workflow required upstream
@@ -1024,6 +1031,10 @@ class SlurmWorkflow(RemoteWorkflowMixin, law.slurm.SlurmWorkflow):
                 colon_format=True,
             )
             config.custom_content.append(("time", job_time))
+        
+        # set job cpus
+        if self.slurm_cpus is not None and self.slurm_cpus > 0:
+            config.custom_content.append(("cpus-per-task", int(self.slurm_cpus)))
 
         # set nodes
         config.custom_content.append(("nodes", 1))

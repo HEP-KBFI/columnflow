@@ -80,6 +80,10 @@ def _egamma_scale_smear(self: Calibrator, events: ak.Array, **kwargs) -> ak.Arra
         "seedGain": coll.seedGain,
         **self.cfg.corrector_kwargs,
     }
+
+    if "AbsScEta" not in variable_map:
+        variable_map["AbsScEta"] = abs(coll.superclusterEta)
+
     def get_inputs(corrector, **additional_variables):
         _variable_map = variable_map | additional_variables
         return (_variable_map[inp.name] for inp in corrector.inputs if inp.name in _variable_map)
