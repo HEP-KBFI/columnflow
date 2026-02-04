@@ -931,7 +931,8 @@ _default_slurm_flavor = law.config.get_expanded("analysis", "slurm_flavor", "max
 _default_slurm_partition = law.config.get_expanded("analysis", "slurm_partition", "cms-uhh")
 _default_slurm_runtime = law.util.parse_duration(
 _default_slurm_cpus = law.config.get_expanded("analysis", "slurm_cpus", 1)
-    law.config.get_expanded("analysis", "slurm_runtime", 3.0),
+
+law.config.get_expanded("analysis", "slurm_runtime", 3.0),
     input_unit="h",
     unit="h",
 )
