@@ -180,7 +180,7 @@ class AnalysisTask(BaseTask, law.SandboxTask):
             "version", "workflow", "job_workers", "poll_interval", "walltime", "max_runtime",
             "retries", "acceptance", "tolerance", "parallel_jobs", "shuffle_jobs", "htcondor_cpus",
             "htcondor_gpus", "htcondor_memory", "htcondor_disk", "htcondor_pool", "pilot", "remote_claw_sandbox",
-            "slurm_cpus",
+            "slurm_cpus", "slurm_mem", "slurm_mem_per_cpu",
         }
         kwargs["_prefer_cli"] = _prefer_cli
 

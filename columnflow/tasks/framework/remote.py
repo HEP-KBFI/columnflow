@@ -930,6 +930,16 @@ class HTCondorWorkflow(RemoteWorkflowMixin, law.htcondor.HTCondorWorkflow):
 _default_slurm_flavor = law.config.get_expanded("analysis", "slurm_flavor", "maxwell")
 _default_slurm_partition = law.config.get_expanded("analysis", "slurm_partition", "cms-uhh")
 _default_slurm_cpus = law.config.get_expanded("analysis", "slurm_cpus", 1)
+_default_slurm_mem = law.util.parse_bytes(
+    law.config.get_expanded("analysis", "slurm_mem", law.NO_FLOAT),
+    input_unit="GB",
+    unit="GB",
+)
+_default_slurm_mem_per_cpu = law.util.parse_bytes(
+    law.config.get_expanded("analysis", "slurm_mem_per_cpu", law.NO_FLOAT),
+    input_unit="GB",
+    unit="GB",
+)
 _default_slurm_runtime = law.util.parse_duration(
     law.config.get_expanded("analysis", "slurm_runtime", 3.0),
     input_unit="h",
@@ -967,6 +977,25 @@ class SlurmWorkflow(RemoteWorkflowMixin, law.slurm.SlurmWorkflow):
         significant=True,
         description="number of CPUs to request; empty value leads to the cluster default setting; "
         "_default_slurm_cpus per default",
+    )
+    slurm_mem = law.BytesParameter(
+        default=_default_slurm_mem,
+        unit="GB",
+        significant=True,
+        description="the real memory required per node in GB."
+        "The --mem, --mem-per-cpu options are mutually exclusive. "
+        "If --mem, --mem-per-cpu are specified as command line arguments, "
+        "then they will take precedence over the environment. "
+        "; empty value leads to the cluster default setting; "
+        "_default_slurm_mem per default",
+    )
+    slurm_mem_per_cpu = law.BytesParameter(
+        default=_default_slurm_mem_per_cpu,
+        unit="GB",
+        significant=True,
+        description="minimum memory required per usable allocated CPU in GB; "
+        "empty value leads to the cluster default setting; "
+        "_default_slurm_mem_per_cpu per default",
     )
 
     # parameters that should not be passed to a workflow required upstream
@@ -1032,9 +1061,13 @@ class SlurmWorkflow(RemoteWorkflowMixin, law.slurm.SlurmWorkflow):
             )
             config.custom_content.append(("time", job_time))
         
-        # set job cpus
+        # set job cpus, mem, mem-per-cpu
         if self.slurm_cpus is not None and self.slurm_cpus > 0:
             config.custom_content.append(("cpus-per-task", int(self.slurm_cpus)))
+        if self.slurm_mem is not None:
+            config.custom_content.append(("mem", self.slurm_mem))
+        if self.slurm_mem_per_cpu is not None:
+            config.custom_content.append(("mem-per-cpu", self.slurm_mem_per_cpu))
 
         # set nodes
         config.custom_content.append(("nodes", 1))
