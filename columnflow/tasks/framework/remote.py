@@ -1065,9 +1065,9 @@ class SlurmWorkflow(RemoteWorkflowMixin, law.slurm.SlurmWorkflow):
         if self.slurm_cpus is not None and self.slurm_cpus > 0:
             config.custom_content.append(("cpus-per-task", int(self.slurm_cpus)))
         if self.slurm_mem is not None and self.slurm_mem >0:
-            config.custom_content.append(("mem", f"{self.slurm_mem} Gb"))
+            config.custom_content.append(("mem", f"{int(self.slurm_mem)}GB"))
         if self.slurm_mem_per_cpu is not None and self.slurm_mem_per_cpu >0:
-            config.custom_content.append(("mem-per-cpu", f"{self.slurm_mem_per_cpu} Gb"))
+            config.custom_content.append(("mem-per-cpu", f"{int(self.slurm_mem_per_cpu)}GB"))
 
         # set nodes
         config.custom_content.append(("nodes", 1))
