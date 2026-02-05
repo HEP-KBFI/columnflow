@@ -981,7 +981,7 @@ class SlurmWorkflow(RemoteWorkflowMixin, law.slurm.SlurmWorkflow):
     slurm_mem = law.BytesParameter(
         default=_default_slurm_mem,
         unit="GB",
-        significant=True,
+        significant=False,
         description="the real memory required per node in GB."
         "The --mem, --mem-per-cpu options are mutually exclusive. "
         "If --mem, --mem-per-cpu are specified as command line arguments, "
@@ -992,7 +992,7 @@ class SlurmWorkflow(RemoteWorkflowMixin, law.slurm.SlurmWorkflow):
     slurm_mem_per_cpu = law.BytesParameter(
         default=_default_slurm_mem_per_cpu,
         unit="GB",
-        significant=True,
+        significant=False,
         description="minimum memory required per usable allocated CPU in GB; "
         "empty value leads to the cluster default setting; "
         "_default_slurm_mem_per_cpu per default",
@@ -1060,14 +1060,14 @@ class SlurmWorkflow(RemoteWorkflowMixin, law.slurm.SlurmWorkflow):
                 colon_format=True,
             )
             config.custom_content.append(("time", job_time))
-        
+       
         # set job cpus, mem, mem-per-cpu
         if self.slurm_cpus is not None and self.slurm_cpus > 0:
             config.custom_content.append(("cpus-per-task", int(self.slurm_cpus)))
-        if self.slurm_mem is not None:
-            config.custom_content.append(("mem", self.slurm_mem))
-        if self.slurm_mem_per_cpu is not None:
-            config.custom_content.append(("mem-per-cpu", self.slurm_mem_per_cpu))
+        if self.slurm_mem is not None and self.slurm_mem >0:
+            config.custom_content.append(("mem", f"{self.slurm_mem} Gb"))
+        if self.slurm_mem_per_cpu is not None and self.slurm_mem_per_cpu >0:
+            config.custom_content.append(("mem-per-cpu", f"{self.slurm_mem_per_cpu} Gb"))
 
         # set nodes
         config.custom_content.append(("nodes", 1))
