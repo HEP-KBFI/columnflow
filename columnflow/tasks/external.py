@@ -124,7 +124,7 @@ class GetDatasetLFNs(DatasetTask, law.tasks.TransferLocalFile):
         self.logger.info(f"found {len(lfns):_} lfn(s) for dataset {self.dataset}")
         if self.limit_dataset_files > 0:
             self.logger.warning("requested limit_dataset_files={limit_dataset_files} for dataset {self.dataset}")
-            lfns =lfns[:int(limit_dataset_files)]
+            lfns =lfns[:int(self.limit_dataset_files)]
         tmp = law.LocalFileTarget(is_tmp=True)
         tmp.dump(lfns, indent=4, formatter="json")
         self.transfer(tmp)
