@@ -36,13 +36,17 @@ class GetDatasetLFNs(DatasetTask, law.tasks.TransferLocalFile):
         default=5,
         description="number of replicas to generate; default: 5",
     )
-
     validate = law.OptionalBoolParameter(
         default=None,
         significant=False,
         description="when True, complains if the number of obtained LFNs does not match the value "
         "expected from the dataset info; default: obtained from 'validate_dataset_lfns' auxiliary "
         "entry in config",
+    )
+    limit_dataset_files = luigi.IntParameter(
+        default=-1,
+        significant=True,
+        description="Limit number of dataset files to process (-1 = all)",
     )
 
     version = None
@@ -118,7 +122,9 @@ class GetDatasetLFNs(DatasetTask, law.tasks.TransferLocalFile):
             )
 
         self.logger.info(f"found {len(lfns):_} lfn(s) for dataset {self.dataset}")
-
+        if self.limit_dataset_files > 0:
+            self.logger.warning("requested limit_dataset_files={limit_dataset_files} for dataset {self.dataset}")
+            lfns =lfns[:int(limit_dataset_files)]
         tmp = law.LocalFileTarget(is_tmp=True)
         tmp.dump(lfns, indent=4, formatter="json")
         self.transfer(tmp)
