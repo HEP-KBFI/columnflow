@@ -1733,10 +1733,17 @@ class DatasetTask(ShiftTask):
 
     # all dataset tasks are meant to work for a single config
     single_config = True
-
+    
     dataset = luigi.Parameter(
         default=default_dataset,
         description=f"name of the dataset to process; default: '{default_dataset}'",
+    )
+
+    limit_dataset_files = luigi.IntParameter(
+        default=-1,
+        significant=True,
+        description="limit the number of files per dataset to process; -1 means no limit; "
+        "default: -1",
     )
 
     file_merging = None
@@ -1838,6 +1845,14 @@ class DatasetTask(ShiftTask):
         return parts
 
     @property
+    def n_files(self) -> int:
+        n_files = self.dataset_info_inst.n_files
+        if self.limit_dataset_files > 0:
+            logger.warning_once(f" number of datasets files are limited to {self.limit_dataset_files}")
+            n_files = min(n_files, self.limit_dataset_files)
+        return n_files
+
+    @property
     def file_merging_factor(self) -> int:
         """
         Returns the number of files that are handled in one branch. When the :py:attr:`file_merging`
@@ -1846,7 +1861,8 @@ class DatasetTask(ShiftTask):
 
         Consecutive merging steps are not handled yet.
         """
-        n_files = self.dataset_info_inst.n_files
+        # n_files = self.dataset_info_inst.n_files
+        n_files = self.n_files
 
         if isinstance(self.file_merging, int):
             # interpret the file_merging attribute as the merging factor itself
@@ -1868,7 +1884,8 @@ class DatasetTask(ShiftTask):
         is simultaneously handling input file indices 3, 4 and 5.
         """
         n_merge = self.file_merging_factor
-        n_files = self.dataset_info_inst.n_files
+        # n_files = self.dataset_info_inst.n_files
+        n_files = self.n_files
 
         # use iter_chunks which splits a list of length n_files into chunks of maximum size n_merge
         chunks = law.util.iter_chunks(n_files, n_merge)
