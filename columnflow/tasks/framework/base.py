@@ -1733,7 +1733,6 @@ class DatasetTask(ShiftTask):
 
     # all dataset tasks are meant to work for a single config
     single_config = True
-    
     dataset = luigi.Parameter(
         default=default_dataset,
         description=f"name of the dataset to process; default: '{default_dataset}'",
