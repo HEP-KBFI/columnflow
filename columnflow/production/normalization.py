@@ -555,7 +555,7 @@ def normalization_weights_setup(
                 xsec = 1.
             else:
                 xsec = process_inst.get_xsec(self.config_inst.campaign.ecm).nominal
-                sum_weights = merged_selection_stats_sum_weights["sum_mc_weight_per_process"][str(process_inst.id)]
+            sum_weights = merged_selection_stats_sum_weights["sum_mc_weight_per_process"][str(process_inst.id)]
             fill_weight_table(process_inst, xsec, sum_weights)
 
     # store lookup table and known process ids
